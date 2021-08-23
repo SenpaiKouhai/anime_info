@@ -8,6 +8,10 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
+app.get('/', (req, res) => {
+    res.send("just append the mal id like this https://anime-get-info.vercel.app/api/(your mal id)")
+})
+
 app.get(`/api/:id`, (req, res) => {
     axios.get(`https://api.jikan.moe/v4/anime/${req.params.id}`)
     .then( resp => {
