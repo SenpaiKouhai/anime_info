@@ -117,22 +117,28 @@ app.get(`/api/:id`, (req, res) => {
 // pictures section on mal
 app.get('/api/:id/images', (req, res) => {
     try {
-        axios.get(`https://api.jikan.moe/v4/anime/${req.params.id}/pictures`)
-        .then( resp => {
-            let data = resp.data.data
-            // console.log(data)
-            let images = []
-            data.map( (data, index) => {
-                images.push({
-                    index: index,
-                    image: data.large_image_url
-                })
+        if(cache.has(req.params.id)) {
+            return res.json(cache.get(req.params.id))
+        } else {
+            axios.get(`https://api.jikan.moe/v4/anime/${req.params.id}/pictures`)
+            .then( resp => {
+                let data = resp.data.data
+                // console.log(data)
+                let images = []
+                data.map( (data, index) => {
+                    images.push({
+                        index: index,
+                        image: data.large_image_url
+                    })
+                } )
+                cache.set(req.params.id, images)
+                res.json({ images })
             } )
-            res.json({ images })
-        } )
-        .catch( err => res.status(404).json({ success: false, msg: err }) )
+            .catch( err => res.status(404).json({ success: false, msg: err }) )
+        }
+       
     } catch (e) {
-        res.status(404).json()
+        res.status(404).json({ success: false, msg: e })
     }
    
 } )
